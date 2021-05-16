@@ -47,10 +47,7 @@ export default function Dashboard(props) {
 		
 
 		const fetchdata = async () => {
-			const fetchimg = await axios(
-				`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
-			);
-	
+			
 	
 			//fetching videos for total hrs streamed
 				const videos=await axios(`https://peaceful-wildwood-66053.herokuapp.com/sql/videoOne/${match.params.id}`);
