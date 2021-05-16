@@ -1,0 +1,29 @@
+.overview:hover{
+    background-color: brown;
+}
+
+.overview a {
+    text-decoration: none;
+    color: white;
+}
+.topbar{
+    width: 100%;
+            height: 150px;
+            align-items: center;
+            display: flex;
+            
+            margin-bottom: 2rem;
+    background-color:rgba(6, 12, 49, 0.95);
+}
+@media only screen and (max-width: 642px) {
+    .topbar{
+        width: 100vh;
+				height: 150px;
+				align-items: center;
+				display: flex;
+				
+				margin-bottom: 2rem;
+        background-color:rgba(6, 12, 49, 0.95);
+    }
+    
+}
