@@ -42,7 +42,7 @@ export default function Dashboard(props) {
 	const [tf,settf]=useState(0);
 	const { match } = props;
 
-	useEffect(() => {
+	useEffect(async() => {
 		//fetching image
 		const fetchimg = await axios(
 			`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
