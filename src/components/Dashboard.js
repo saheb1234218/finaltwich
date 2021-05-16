@@ -44,96 +44,96 @@ export default function Dashboard(props) {
 
 	useEffect(() => {
 		//fetching image
-		
+		const fetchimg = await axios(
+			`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
+		);
+
+
+		//fetching videos for total hrs streamed
+			const videos=await axios(`https://peaceful-wildwood-66053.herokuapp.com/sql/videoOne/${match.params.id}`);
+			const xyz=videos.data;
+			
+			for (var q in xyz){
+				var totalcount;
+				for (var w in xyz[q]){
+					var qwt=0;
+					var totqwt;
+					const time=xyz[q][w].duration
+				//	console.log(time);
+					for(var l in time){
+						if(time[l]==='h' || time[l]==='m' || time[l]==='s'){
+							
+							if(time[l]==='h'){
+						//	console.log("hour",qwt);
+							totqwt=totqwt+qwt;
+							qwt=0;
+						}
+						if(time[l]==='m'){
+							//console.log("min",qwt);
+							qwt=qwt/60; //converting to hrs
+							totqwt=totqwt+qwt;
+							qwt=0;
+						}
+						if(time[l]==='s'){
+							
+							//	console.log("sec",qwt)
+							qwt=qwt/3600; //converting to hrs
+							totqwt=totqwt+qwt;
+							if(isNaN(totqwt)==true){
+								totqwt=0;
+							}
+							else{
+								totqwt=totqwt+qwt;
+								qwt=0;
+
+							}
+
+							
+							
+							
+						}
+					}
+						else{
+						//	console.log(time[l])
+							qwt=qwt*10+Number(time[l]);
+						}
+					}
+					totqwt=totqwt.toFixed(2)
+				//	console.log("tot sum",totqwt); //total hrs of a video
+					totalhours.push(totqwt); //pushing in array for hrs stream chart
+					totalcount=totalcount+Number(totqwt);
+					if(isNaN(totalcount)==true){
+						totalcount=0;
+					}
+					else{
+					//	console.log("tot count",totalcount); //total hrs of all videos
+						totqwt=0;
+					}
+					
+
+				}
+				totalcount=totalcount.toFixed(2)
+				//console.log("total hours streamed",totalcount);
+				settothrs(totalcount)
+				//console.log("array",totalhours);
+			}
+
+			//followers array
+			const follw=await axios.get(`https://peaceful-wildwood-66053.herokuapp.com/sql/followersOne/${match.params.id}`);
+			const follwdata=follw.data;
+			console.log(follwdata);
+			for(var x in follwdata){
+				for(var y in follwdata[x]){
+					//console.log(follwdata[x][y].followed_at);
+					const sl=follwdata[x][y].followed_at.slice(11,13);
+					timeframe.push(Number(sl));
+				}
+			}
+			settf(timeframe.length);
+			console.log(tf);
+
 
 		const fetchdata = async () => {
-			
-	
-			//fetching videos for total hrs streamed
-				const videos=await axios(`https://peaceful-wildwood-66053.herokuapp.com/sql/videoOne/${match.params.id}`);
-				const xyz=videos.data;
-				
-				for (var q in xyz){
-					var totalcount;
-					for (var w in xyz[q]){
-						var qwt=0;
-						var totqwt;
-						const time=xyz[q][w].duration
-					//	console.log(time);
-						for(var l in time){
-							if(time[l]==='h' || time[l]==='m' || time[l]==='s'){
-								if(l===0){
-									continue;
-								}
-								if(time[l]==='h'){
-							//	console.log("hour",qwt);
-								totqwt=totqwt+qwt;
-								qwt=0;
-							}
-							if(time[l]==='m'){
-								//console.log("min",qwt);
-								qwt=qwt/60; //converting to hrs
-								totqwt=totqwt+qwt;
-								qwt=0;
-							}
-							if(time[l]==='s'){
-								
-								//	console.log("sec",qwt)
-								qwt=qwt/3600; //converting to hrs
-								totqwt=totqwt+qwt;
-								if(isNaN(totqwt)==true){
-									totqwt=0;
-								}
-								else{
-									totqwt=totqwt+qwt;
-									qwt=0;
-	
-								}
-	
-								
-								
-								
-							}
-						}
-							else{
-							//	console.log(time[l])
-								qwt=qwt*10+Number(time[l]);
-							}
-						}
-						totqwt=totqwt.toFixed(2)
-					//	console.log("tot sum",totqwt); //total hrs of a video
-						totalhours.push(totqwt); //pushing in array for hrs stream chart
-						totalcount=totalcount+Number(totqwt);
-						if(isNaN(totalcount)==true){
-							totalcount=0;
-						}
-						else{
-						//	console.log("tot count",totalcount); //total hrs of all videos
-							totqwt=0;
-						}
-						
-	
-					}
-					totalcount=totalcount.toFixed(2)
-					//console.log("total hours streamed",totalcount);
-					settothrs(totalcount)
-					//console.log("array",totalhours);
-				}
-	
-				//followers array
-				const follw=await axios.get(`https://peaceful-wildwood-66053.herokuapp.com/sql/followersOne/${match.params.id}`);
-				const follwdata=follw.data;
-				console.log(follwdata);
-				for(var x in follwdata){
-					for(var y in follwdata[x]){
-						//console.log(follwdata[x][y].followed_at);
-						const sl=follwdata[x][y].followed_at.slice(11,13);
-						timeframe.push(Number(sl));
-					}
-				}
-				settf(timeframe.length);
-				console.log(tf);
-	
 			const fetchimg = await axios(
 				`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
 			);
@@ -141,7 +141,6 @@ export default function Dashboard(props) {
 				`https://murmuring-oasis-70868.herokuapp.com/k/channelFollowers/${match.params.id}`
 			);
 			const video = await axios(`https://murmuring-oasis-70868.herokuapp.com/k/channelvideo/${match.params.id}`);
-
 			//  const userfollows=await axios('https://murmuring-oasis-70868.herokuapp.com/k/userFollows/44322889');
 			setvid(video.data.data.videos);
 			console.log(vid);
