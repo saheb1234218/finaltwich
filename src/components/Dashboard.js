@@ -15,34 +15,36 @@ export default function Dashboard(props) {
 	// const [vew, setVew] = useState([]);
 	const dupVew = [];
 	const [vidvw, setvidvw] = useState([]);
-	const [lenofvid, setLenofvid] = useState([]);
+	
 	const dupLenofvid = [];
 	const [tothrs,settothrs]=useState(0);
 	const [len, setlen] = useState([]);
-	const [rec, setRec] = useState([]);
+	
 	const dupRec = []
 	const [cr, setcr] = useState([]);
 	const [isloading, setisloading] = useState(false);
-	const [creat, setcreat] = useState("");
+	
 	const [vid, setvid] = useState([]);
 	const [ar, setar] = useState([]);
-	const [followersofuser, setfollowersofuser] = useState([]);
-	const [viewsofuser, setviewsofuser] = useState([]);
-	const [followersph, setfollowersph] = useState([]);
+	
 	const followersarray = [];
-	const finalarray = [];
+	
 	const viewersarray = [];
 	const followersperh = [];
 	const viewh = [];
 	const streamtime = [];
 	const gamesh = [];
 	const totalhours=[];
-	const [totalhrs,settotalhrs]=useState([]);
+	
 	const timeframe=[]
 	const [tf,settf]=useState(0);
+	const viewc=[]
+
+
 	const { match } = props;
 
 	useEffect(async() => {
+		setisloading(true);
 		//fetching image
 		const fetchimg = await axios(
 			`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
@@ -59,6 +61,8 @@ export default function Dashboard(props) {
 					var qwt=0;
 					var totqwt;
 					const time=xyz[q][w].duration
+					const viewcount=xyz[q][w].view_count
+					viewc.push(viewcount);
 				//	console.log(time);
 					for(var l in time){
 						if(time[l]==='h' || time[l]==='m' || time[l]==='s'){
@@ -137,9 +141,7 @@ export default function Dashboard(props) {
 			const fetchimg = await axios(
 				`https://murmuring-oasis-70868.herokuapp.com/k/channelInfo/${match.params.id}`
 			);
-			const followers = await axios(
-				`https://murmuring-oasis-70868.herokuapp.com/k/channelFollowers/${match.params.id}`
-			);
+			
 			const video = await axios(`https://murmuring-oasis-70868.herokuapp.com/k/channelvideo/${match.params.id}`);
 			//  const userfollows=await axios('https://murmuring-oasis-70868.herokuapp.com/k/userFollows/44322889');
 			setvid(video.data.data.videos);
@@ -167,32 +169,7 @@ export default function Dashboard(props) {
 			setlen(dupLenofvid);
 			setcr(dupRec);
 			setvidvw(dupVew);
-			// setVew(dupVew);
-			// setLenofvid(dupLenofvid);
-			// setRec(dupRec);
 			
-			// console.log(lenofvid)
-			// console.log(rec)
-			// console.log(vew)
-			//	for (var key in followers.data) {
-			//	for (var key1 in followers.data[key]) {
-			//	if (Array.isArray(followers.data[key][key1]) == true) {
-			//		const listofitems = [...followers.data[key][key1]];
-
-			//		for (var x in listofitems) {
-			//		for (var y in listofitems[x]) {
-			//			if (
-			//				typeof listofitems[x][y] === 'object' &&
-			//				listofitems[x][y] !== null
-			//			) {
-			//finalarray.push(listofitems[x][y].display_name);
-			//		}
-			//		}
-			//	}
-			//	}
-			//}
-			//	}
-			//console.log(finalarray);
 
 
 			await axios
@@ -221,8 +198,7 @@ export default function Dashboard(props) {
 					}
 
 					//console.log(followersarray);
-					setfollowersofuser(followersarray);
-					setviewsofuser(viewersarray);
+					
 
 					const ctx = document.getElementById('mybarChart');
 					new Chart(ctx, {
@@ -258,7 +234,7 @@ export default function Dashboard(props) {
 							datasets: [
 								{
 									data: totalhours,
-									label: 'Hours Streamed',
+									label: 'Each Video',
 									
 									backgroundColor: [
 										'Blue',
@@ -318,6 +294,30 @@ export default function Dashboard(props) {
 								},
 							],
 						},
+						options: {
+							scales: {
+								yAxes:[{
+									gridLines:{
+										display:true,
+									},
+									ticks:{
+										min:0,
+										max:3,
+										stepSize:0.3,
+									},
+									scaleLabel:{
+										display:true,
+										labelString: "No of hours streamed",
+									}
+								}],
+								xAxes:[{
+									gridLines:{
+										display:false,
+									},
+									
+								}]
+							}
+						}
 					});
 					const ctx2 = document.getElementById('mylineChart');
 					new Chart(ctx2, {
@@ -411,7 +411,9 @@ export default function Dashboard(props) {
 									borderWidth: 1,
 								},
 							],
+							
 						},
+						
 					});
 					const ctx1 = document.getElementById('mypieChart');
 					new Chart(ctx1, {
@@ -532,17 +534,12 @@ export default function Dashboard(props) {
 								'',
 								'',
 								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
+								
 							],
 							datasets: [
 								{
-									label: 'Viewers Count',
-									data: viewh,
+									label: 'Each Video',
+									data: viewc,
 									backgroundColor: [
 										'Blue',
 										'Blue',
@@ -585,6 +582,14 @@ export default function Dashboard(props) {
 						options: {
 							responsive: true,
 							maintainAspectRatio: false,
+							scales:{
+							yAxes:[{
+								scaleLabel:{
+									display:true,
+									labelString:"No of viewers",
+								}
+							}]
+						}
 						},
 					});
 					const ctx4 = document.getElementById('mybar2Chart');
@@ -732,10 +737,15 @@ export default function Dashboard(props) {
 				});
 		};
 		fetchdata();
+		setisloading(false);
 	}, []);
 
 
 	return (
+		isloading?<div style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',width:'100vw',height:'100vh'}}>
+		<Spinner animation="border" variant="primary" style={{width:'80px',height:'80px',}}></Spinner>
+		<h4>Page Loading......</h4>
+	</div>:
 		<div
 			style={{
 				display: 'flex',
@@ -812,7 +822,7 @@ export default function Dashboard(props) {
 					// margin: '40px 20px 40px 20px',
 					margin: '40px auto',
 					// padding: '1.5rem',
-					width: '87%',
+					width: '80%',
 					height: '50vh',
 					justifyContent: 'center',
 					alignItems: 'center',
