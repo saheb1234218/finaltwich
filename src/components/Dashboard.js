@@ -35,11 +35,14 @@ export default function Dashboard(props) {
 	const streamtime = [];
 	const gamesh = [];
 	const totalhours=[];
-	
-	const timeframe=[]
+	const lasthour=[];
+	const timeframe=[];
 	const [tf,settf]=useState(0);
-	const viewc=[]
-
+	const [ld,setld]=useState(0);
+	const viewc=[];
+	const dict={};
+	const timehour=[];
+	const numberoffol=[];
 
 	const { match } = props;
 
@@ -121,11 +124,59 @@ export default function Dashboard(props) {
 				settothrs(totalcount)
 				//console.log("array",totalhours);
 			}
+			//followers of last day hour wise
+			const lastday=await axios.get(`https://peaceful-wildwood-66053.herokuapp.com/sql/followersOneDay/${match.params.id}`);
+			const lastdata=lastday.data.result;
+			//console.log(lastdata);
+			for(var key in lastdata)
+			{
+				for(var key1 in lastdata[key])
+				{
+					if(key1==='followed_at'){
+						lasthour.push(Number(lastdata[key][key1].slice(11,13)))
+					}
+				}
+			}
+			//console.log(lasthour)
+			for (x in lasthour)
+			{
+				if(lasthour[x] in dict)
+				{
+					dict[lasthour[x]]=dict[lasthour[x]]+1;
+				}
+				else{
+					dict[lasthour[x]]=1;
+				}
+			}
+			//console.log(dict)
+
+			for(var x=0;x<=23;x++)
+			{
+				if(x in dict){
+					timehour.push(x);
+				numberoffol.push(dict[x]);
+				}
+				else{
+					timehour.push(x);
+					numberoffol.push(0);
+				}
+				
+			}
+			//console.log("all followers",numberoffol);
+
+			//console.log("all time",timehour);
+			
+			
+			var summ=0;
+			for(x in numberoffol){
+				summ=summ+numberoffol[x];
+			}
+			setld((summ/24).toFixed(2));
 
 			//followers array
 			const follw=await axios.get(`https://peaceful-wildwood-66053.herokuapp.com/sql/followersOne/${match.params.id}`);
 			const follwdata=follw.data;
-			console.log(follwdata);
+			//console.log(follwdata);
 			for(var x in follwdata){
 				for(var y in follwdata[x]){
 					//console.log(follwdata[x][y].followed_at);
@@ -133,8 +184,9 @@ export default function Dashboard(props) {
 					timeframe.push(Number(sl));
 				}
 			}
+			console.log(timeframe);
 			settf(timeframe.length);
-			console.log(tf);
+			//console.log(tf);
 
 
 		const fetchdata = async () => {
@@ -145,7 +197,7 @@ export default function Dashboard(props) {
 			const video = await axios(`https://murmuring-oasis-70868.herokuapp.com/k/channelvideo/${match.params.id}`);
 			//  const userfollows=await axios('https://murmuring-oasis-70868.herokuapp.com/k/userFollows/44322889');
 			setvid(video.data.data.videos);
-			console.log(vid);
+			//console.log(vid);
 			setar(fetchimg.data.data);
 			for (var key in video.data.data.videos) {
 				for (var key1 in video.data.data.videos[key]) {
@@ -165,7 +217,7 @@ export default function Dashboard(props) {
 				}
 
 			}
-			console.log("views array")
+	//	console.log("views array")
 			setlen(dupLenofvid);
 			setcr(dupRec);
 			setvidvw(dupVew);
@@ -419,37 +471,11 @@ export default function Dashboard(props) {
 					new Chart(ctx1, {
 						type: 'bar',
 						data: {
-							labels: [
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-								'',
-							],
+							labels: ["12am","1am","2am","3am","4am","5am","6am","7am","8am","9am","10am","11am","12pm","1pm","2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm","10pm","11pm"],
 							datasets: [
 								{
-									label: 'Followers per hour',
-									data: timeframe,
+									label: 'Time (24 hrs format)',
+									data: numberoffol,
 									backgroundColor: [
 										'Red',
 										'Red',
@@ -508,6 +534,21 @@ export default function Dashboard(props) {
 								},
 							],
 						},
+						options: {
+							scales: {
+								yAxes:[{
+									gridLines:{
+										display:true,
+									},
+									
+									scaleLabel:{
+										display:true,
+										labelString: "No of followers",
+									}
+								}],
+								
+							}
+						}
 					});
 
 					const ctx3 = document.getElementById('myline2Chart');
@@ -807,7 +848,7 @@ export default function Dashboard(props) {
 						alignItems: 'center',
 					}}
 				>
-					<h3 style={{marginLeft:'20px',color:'#00cc99'}}>{tf} p/Hr</h3>
+					<h5 style={{marginLeft:'20px',color:'#00cc99'}}>{ld} per/Hr</h5>
 					<canvas id='mypieChart' width='360' height='200' />
 				</div>
 			</div>
